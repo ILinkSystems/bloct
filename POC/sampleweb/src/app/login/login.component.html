@@ -1,0 +1,12 @@
+<div class="login-div">
+  <div>
+    <input type="text" class="input-text" [(ngModel)]="userName" placeholder="Username*" />
+  </div>
+  <div>
+    <input type="password" class="input-text" [(ngModel)]="password" placeholder="Password*" />
+  </div>
+  <div>
+    <label class="input-text">{{result}}</label>
+  </div>
+  <button type="submit" class="submit-button" (click)="loginClicked()">Login</button>
+</div>

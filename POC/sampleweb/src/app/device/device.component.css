@@ -1,0 +1,23 @@
+.left-pane {
+    width: 30%;
+    background-color: lightgray;
+    float: left;
+    color: black;
+    height: 500px;
+  }
+  
+  .right-pane {
+    width: 70%;
+    float: right;
+  }
+  
+  .logo {
+    width: 100%;
+    clear: both;
+    display: inline-block;
+    margin-bottom: 35px;
+  }
+  
+  agm-map {  
+      height: 500px;  
+   }

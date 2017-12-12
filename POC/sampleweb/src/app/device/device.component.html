@@ -1,0 +1,28 @@
+<div>
+  <div class="left-pane">
+    <div class="logo">
+      <div style="float: left">BLOCT</div>
+      <div class="dropdown" dropdown style="float: right !important">
+        <a dropdown-open>{{currentUser?.firstName}} {{currentUser?.lastName}}</a>
+        <ul class="dropdown-menu">
+          <li>
+            <a>Manage Profile</a>
+          </li>
+          <li>
+            <a (click)="logout()">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div style="float: left">{{currentDevice?.deviceName}} Details</div>
+      <button style="float: right" (click)="back()">Back</button>
+    </div>
+  </div>
+  <div class="right-pane">
+    <div>
+      <div style="float: left">Video Feed</div>
+      <div style="float: right">{{date}}</div>
+    </div>
+  </div>
+</div>

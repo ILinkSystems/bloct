@@ -1,0 +1,49 @@
+<div>
+  <div class="left-pane">
+    <div class="logo">
+      <div style="float: left">BLOCT</div>
+      <div class="dropdown" dropdown style="float: right !important">
+        <a dropdown-open>{{currentUser?.firstName}} {{currentUser?.lastName}}</a>
+        <ul class="dropdown-menu">
+          <li>
+            <a>Manage Profile</a>
+          </li>
+          <li>
+            <a (click)="logout()">Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div style="float: left">Devices</div>
+      <button style="float: right" (click)="addDevice()">Add Device</button>
+    </div>
+    <div style="margin-top: 50px;">
+      <ul>
+        <li *ngFor="let device of apiService.devices" (click)="onDeviceSelect(device)">
+          {{device.deviceName}}
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="right-pane">
+    <agm-map [latitude]="lat" [longitude]="lng">
+      <agm-marker *ngFor="let m of markers; let i = index" [latitude]="m.lat" [longitude]="m.lng" [label]="m.label" [markerDraggable]="m.draggable"></agm-marker>
+    </agm-map>
+  </div>
+</div>
+
+<popup (confirmClick)="saveNewDevice()">
+  <div style="display: grid">
+    <label>Device Type</label>
+    <select [(ngModel)]="selectedDeviceType">
+      <option *ngFor="let deviceType of deviceTypes" [ngValue]="deviceType">{{deviceType.typeName}}</option>
+    </select>
+    <label>Device Name</label>
+    <input type="text" [(ngModel)]="deviceName">
+    <label>Username</label>
+    <input type="text" [(ngModel)]="username">
+    <label>Password</label>
+    <input type="password" [(ngModel)]="password">
+  </div>
+</popup>
