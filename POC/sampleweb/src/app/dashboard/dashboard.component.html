@@ -1,7 +1,7 @@
 <div>
   <div class="left-pane">
     <div class="logo">
-      <div style="float: left">BLOCT</div>
+      <img style="float: left" [src]="apiService.LOGO">
       <div class="dropdown" dropdown style="float: right !important">
         <a dropdown-open>{{currentUser?.firstName}} {{currentUser?.lastName}}</a>
         <ul class="dropdown-menu">

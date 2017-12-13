@@ -11,6 +11,7 @@ export class APIService {
   public token = '';
   public currentUser: any;
   public devices: any;
+  private LOGO = './assets/images/logo.jpg';
 
   authenticate(body): Promise<any> {
     return this.http.post(this.baseUrl + 'login/authenticate', body)

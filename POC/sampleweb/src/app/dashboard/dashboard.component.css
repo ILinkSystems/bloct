@@ -18,6 +18,23 @@
   margin-bottom: 35px;
 }
 
-agm-map {  
-    height: 500px;  
- }
+agm-map {
+  height: 500px;
+}
+
+a:hover {
+  color: #000000;
+  cursor: pointer;
+}
+
+a.active {
+  color: #000000;
+}
+
+a {
+  color: blue;
+}
+
+a:hover {
+  cursor: pointer;
+}
