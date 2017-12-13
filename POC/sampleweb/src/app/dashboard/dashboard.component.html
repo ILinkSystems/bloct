@@ -20,8 +20,15 @@
     </div>
     <div style="margin-top: 50px;">
       <ul>
-        <li *ngFor="let device of apiService.devices" (click)="onDeviceSelect(device)">
-          {{device.deviceName}}
+        <li *ngFor="let device of apiService.devices" (click)="showActions = !showActions">
+          <div>
+            {{device.deviceName}}
+            <div *ngIf="showActions">
+              <button (click)="onLocateOnMap(device)">Locate on Map</button>
+              <button (click)="onViewDetails(device)">View Details</button>
+              <button>View Blockchain</button>
+            </div>
+          </div>
         </li>
       </ul>
     </div>

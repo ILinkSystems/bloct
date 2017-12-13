@@ -34,8 +34,8 @@ export class APIService {
       .then(response => response);
   }
 
-  addNestcamDevices(body): Promise<any> {
-    return this.http.post(this.baseUrl + 'device/nestcamDevices', body, {
+  addNestcamDevices(isNew, body): Promise<any> {
+    return this.http.post(this.baseUrl + 'device/nestcamDevices/' + isNew, body, {
       headers: new HttpHeaders().set('x-access-token', this.token),
     })
       .toPromise()

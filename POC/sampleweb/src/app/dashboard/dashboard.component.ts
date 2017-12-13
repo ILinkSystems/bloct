@@ -20,6 +20,7 @@ export class DashboardComponent implements OnInit {
     private password: string;
     private lat = 51.673858;
     private lng = 7.815982;
+    private isNew = true;
 
     markers = [
         {
@@ -59,6 +60,21 @@ export class DashboardComponent implements OnInit {
                 if (data.success) {
                     this.apiService.devices.push(data.nestcamDevice);
                 }
+            }).catch(error => {
+                if (error.status === 500) {
+                    this.apiService.getApiDetails().then(data => {
+                        this.isNew = false;
+                        for (let i = 0, len = data.apiDetails.length; i < len; i++) {
+                            if (data.apiDetails[i].deviceName === 'Nestcam') {
+                                this.selectedDeviceType = data.apiDetails[i].selectedDeviceType;
+                                this.deviceName = data.apiDetails[i].deviceName;
+                                this.username = data.apiDetails[i].username;
+                                this.password = data.apiDetails[i].password;
+                                this.saveNewDevice();
+                            }
+                        }
+                    });
+                }
             });
         }
     }
@@ -89,8 +105,7 @@ export class DashboardComponent implements OnInit {
         };
         switch (this.selectedDeviceType.id) {
             case 3:
-                console.log(body);
-                this.apiService.addNestcamDevices(body).then(data => {
+                this.apiService.addNestcamDevices(this.isNew, body).then(data => {
                     if (data.success) {
                         this.apiService.devices.push(data.nestcamDevice);
                     }
@@ -108,10 +123,13 @@ export class DashboardComponent implements OnInit {
         this.selectedDeviceType = this.deviceTypes[0];
     }
 
-    onDeviceSelect(device) {
+    onLocateOnMap(device) {
         this.lat = 51.673858;
         this.lng = 7.815982;
-        this.router.navigate(['/device',  device.deviceName]);
+    }
+
+    onViewDetails(device) {
+        this.router.navigate(['/device', device.deviceName]);
     }
 
     logout() {

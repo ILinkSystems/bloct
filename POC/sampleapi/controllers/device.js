@@ -39,7 +39,17 @@ router.get('/deviceTypes', function (req, res) {
     });
 });
 
-router.post('/nestcamDevices', function (req, res) {
+router.get('/apiDetails', function (req, res) {
+    connection.db.collection('apidetails').find().toArray(function (err, apiDetails) {
+        if (err) throw err;
+        res.json({
+            success: true,
+            apiDetails: apiDetails
+        });
+    });
+});
+
+router.post('/nestcamDevices/:isNew', function (req, res) {
     nestApi = new NestApi(req.body.username, req.body.password)
     nestApi.login(function (data) {
         nestApi.get(function (data) {
@@ -57,13 +67,25 @@ router.post('/nestcamDevices', function (req, res) {
                     serialNumber: device.serial_number,
                     firmwareVersion: device.software_version
                 }
-                connection.db.collection('apidetails').insertOne(req.body, function (err, result) {
-                    if (err) throw err;
-                    res.json({
-                        success: true,
-                        nestcamDevice: data
+                if (req.params.isNew === true) {
+                    connection.db.collection('apidetails').insertOne(req.body, function (err, result) {
+                        if (err) throw err;
+                        res.json({
+                            success: true,
+                            nestcamDevice: data
+                        });
                     });
-                });
+                } else {
+                    connection.db.collection('apidetails').updateOne({
+                        deviceName: "Nestcam"
+                    }, req.body, function (err, result) {
+                        if (err) throw err;
+                        res.json({
+                            success: true,
+                            nestcamDevice: data
+                        });
+                    });
+                }
             });
         });
     });
