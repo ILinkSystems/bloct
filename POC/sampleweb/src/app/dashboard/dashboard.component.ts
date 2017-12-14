@@ -56,16 +56,16 @@ export class DashboardComponent implements OnInit {
                     this.selectedDeviceType = this.deviceTypes[0];
                 }
             });
-            this.apiService.getNestcamDevices().then(data => {
+            this.apiService.getArloDevices().then(data => {
                 if (data.success) {
-                    this.apiService.devices.push(data.nestcamDevice);
+                    this.apiService.devices.push(data.arloDevice);
                 }
             }).catch(error => {
                 if (error.status === 500) {
                     this.apiService.getApiDetails().then(data => {
-                        this.isNew = false;
                         for (let i = 0, len = data.apiDetails.length; i < len; i++) {
-                            if (data.apiDetails[i].deviceName === 'Nestcam') {
+                            if (data.apiDetails[i].deviceName === 'Arlo') {
+                                this.isNew = false;
                                 this.selectedDeviceType = data.apiDetails[i].selectedDeviceType;
                                 this.deviceName = data.apiDetails[i].deviceName;
                                 this.username = data.apiDetails[i].username;
@@ -105,9 +105,9 @@ export class DashboardComponent implements OnInit {
         };
         switch (this.selectedDeviceType.id) {
             case 3:
-                this.apiService.addNestcamDevices(this.isNew, body).then(data => {
+                this.apiService.addArloDevices(this.isNew, body).then(data => {
                     if (data.success) {
-                        this.apiService.devices.push(data.nestcamDevice);
+                        this.apiService.devices.push(data.arloDevice);
                     }
                 });
                 break;

@@ -3,7 +3,7 @@ var express = require('express'),
     jwt = require('jsonwebtoken'),
     connection = require('../helpers/mongo_connections.js'),
     smart_contract = require('../helpers/smart_contract.js'),
-    NestApi = require('nest-api');
+    ArloApi = require('node-arlo-api/arlo-api');
 
 router.use(function (req, res, next) {
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
@@ -49,40 +49,48 @@ router.get('/apiDetails', function (req, res) {
     });
 });
 
-router.post('/nestcamDevices/:isNew', function (req, res) {
-    nestApi = new NestApi(req.body.username, req.body.password)
-    nestApi.login(function (data) {
-        nestApi.get(function (data) {
-            var quartz = data.quartz
-            var device = data.quartz[Object.keys(data.quartz)[0]];
+router.post('/arloDevices/:isNew', function (req, res) {
+    const arlo = new ArloApi(req.body.username, req.body.password);
+    arlo.getDevices().then(deviceArray => {
+        for (var i = 0; i < deviceArray.length; i++) {
+            if (deviceArray[i].deviceType === 'camera') {
+                var arloCamera = {
+                    deviceName: deviceArray[i].deviceName,
+                    deviceId: deviceArray[i].deviceId,
+                    serialNumber: deviceArray[i].uniqueId,
+                    firmwareVersion: deviceArray[i].firmwareVersion
+                }
+            }
+        }
+        arlo.getCameras(deviceArray[0].deviceId, deviceArray[0].xCloudId).then(cameras => {
+            for (var i = 0; i < cameras.properties.length; i++) {
+                if (arloCamera.deviceId === cameras.properties[i].serialNumber) {
+                    arloCamera.batteryLevel = cameras.properties[i].batteryLevel
+                }
+            }
             var contractInstance = smart_contract.contract.at(smart_contract.deployedAddress);
-            contractInstance.addDeviceData(device.description, 1, device.serial_number, device.software_version, {
+            contractInstance.addDeviceData(arloCamera.deviceName, arloCamera.deviceId, arloCamera.serialNumber, arloCamera.firmwareVersion, {
                 from: smart_contract.web3.eth.coinbase,
                 gas: 900000
             }, (err, transactionHash) => {
                 req.body.transactionHash = transactionHash;
-                data = {
-                    deviceName: device.description,
-                    deviceId: 1,
-                    serialNumber: device.serial_number,
-                    firmwareVersion: device.software_version
-                }
-                if (req.params.isNew === true) {
+                req.body.deviceId = arloCamera.deviceId;
+                if (req.params.isNew === 'true') {
                     connection.db.collection('apidetails').insertOne(req.body, function (err, result) {
                         if (err) throw err;
                         res.json({
                             success: true,
-                            nestcamDevice: data
+                            arloDevice: arloCamera
                         });
                     });
                 } else {
                     connection.db.collection('apidetails').updateOne({
-                        deviceName: "Nestcam"
+                        deviceName: "Arlo"
                     }, req.body, function (err, result) {
                         if (err) throw err;
                         res.json({
                             success: true,
-                            nestcamDevice: data
+                            arloDevice: arloCamera
                         });
                     });
                 }
@@ -91,10 +99,11 @@ router.post('/nestcamDevices/:isNew', function (req, res) {
     });
 });
 
-router.get('/nestcamDevices', function (req, res) {
+router.get('/arloDevices', function (req, res) {
     var contractInstance = smart_contract.contract.at(smart_contract.deployedAddress);
-    var device = contractInstance.getDeviceData.call();
-    data = {
+    var device = contractInstance.getDeviceData.call('52M17B7PAAE79');
+    if(device[0] == '') throw err;
+    arloDevice = {
         deviceName: device[0],
         deviceId: device[1],
         serialNumber: device[2],
@@ -102,7 +111,7 @@ router.get('/nestcamDevices', function (req, res) {
     }
     res.json({
         success: true,
-        nestcamDevice: data
+        arloDevice: arloDevice
     });
 });
 

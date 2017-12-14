@@ -35,16 +35,16 @@ export class APIService {
       .then(response => response);
   }
 
-  addNestcamDevices(isNew, body): Promise<any> {
-    return this.http.post(this.baseUrl + 'device/nestcamDevices/' + isNew, body, {
+  addArloDevices(isNew, body): Promise<any> {
+    return this.http.post(this.baseUrl + 'device/arloDevices/' + isNew, body, {
       headers: new HttpHeaders().set('x-access-token', this.token),
     })
       .toPromise()
       .then(response => response);
   }
 
-  getNestcamDevices(): Promise<any> {
-    return this.http.get(this.baseUrl + 'device/nestcamDevices', {
+  getArloDevices(): Promise<any> {
+    return this.http.get(this.baseUrl + 'device/arloDevices', {
       headers: new HttpHeaders().set('x-access-token', this.token),
     })
       .toPromise()
