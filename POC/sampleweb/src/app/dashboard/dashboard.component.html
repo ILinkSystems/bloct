@@ -1,56 +1,115 @@
-<div>
-  <div class="left-pane">
-    <div class="logo">
-      <img style="float: left" [src]="apiService.LOGO">
-      <div class="dropdown" dropdown style="float: right !important">
-        <a dropdown-open>{{currentUser?.firstName}} {{currentUser?.lastName}}</a>
-        <ul class="dropdown-menu">
-          <li>
-            <a>Manage Profile</a>
-          </li>
-          <li>
-            <a (click)="logout()">Logout</a>
+<section class="container-fluid">
+  <div class="row">
+    <div class="col-md-3 pd0-LR">
+      <div class="deviceContainer">
+        <div class="deviceHeader clearfix">
+          <a href="javascript:;" class="float-left">
+            <img class="deviceLogo" src="assets/images/theme-dark/logo-bloct-v2-white.png">
+          </a>
+          <!-- <div class="float-right">
+
+                  </div> -->
+          <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown text-right">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                <img src="assets/images/theme-light/button-hamburgermenu-white.png">
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a href="javascript:;">Manage Profile</a>
+                </li>
+                <li class="divider"></li>
+                <li>
+                  <a href="javascript:;" (click)="logout()">Logout</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="addDeviceHead clearfix">
+          <h4 class="float-left">Devices</h4>
+          <a href="javascript:;" class="float-right" (click)="addDevice()">
+            <img src="assets/images/theme-light/button-adddevice.png"> Add Device
+          </a>
+        </div>
+        <ul class="listGroup">
+          <li class="listItem active clearfix" [class.active]="showActions" *ngFor="let device of apiService.devices" (click)="showActions = !showActions">
+            <div>
+              <img src="assets/images/theme-light/icon-device-nest-camera.png">
+            </div>
+            <div class="detailsWrap float-left">
+              <div class="detailLine title">
+                <div class="left">
+                  <h5>{{device.deviceName}}</h5>
+                </div>
+                <div class="right">
+                  <img src="assets/images/theme-light/button-menuellipsis.png">
+                </div>
+              </div>
+              <div class="detailLine desc">
+                <div class="left">
+                  <p>Additional identifiying Text e.g. Bedroom SW, Gate 17</p>
+                </div>
+                <div class="right">
+
+                </div>
+              </div>
+              <div class="detailLine precauition">
+                <div class="left">
+                  <a href="javascript:;" class="risk">At Risk</a>
+                </div>
+                <div class="right">
+                  <img class="riskIcon" src="assets/images/theme-light/badge-atrisk.png">
+                </div>
+              </div>
+              <div class="routeIcon clearfix" *ngIf="showActions">
+                <ul>
+                  <li (click)="onLocateOnMap(device)">
+                    <img src="assets/images/theme-light/icon-locatedevice.png">
+                    <span>Locate on Map</span>
+                  </li>
+                  <li (click)="onViewDetails(device)">
+                    <img src="assets/images/theme-light/icon-deviceinfo.png">
+                    <span>View Details</span>
+                  </li>
+                  <li>
+                    <img src="assets/images/theme-light/icon-viewblockchain.png">
+                    <span>View Blockchain</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </li>
         </ul>
       </div>
     </div>
-    <div>
-      <div style="float: left">Devices</div>
-      <button style="float: right" (click)="addDevice()">Add Device</button>
-    </div>
-    <div style="margin-top: 50px;">
-      <ul>
-        <li *ngFor="let device of apiService.devices" (click)="showActions = !showActions">
-          <div>
-            {{device.deviceName}}
-            <div *ngIf="showActions">
-              <button (click)="onLocateOnMap(device)">Locate on Map</button>
-              <button (click)="onViewDetails(device)">View Details</button>
-              <button>View Blockchain</button>
-            </div>
-          </div>
-        </li>
-      </ul>
+    <div class="col-md-9 pd0-LR">
+      <agm-map [latitude]="lat" [longitude]="lng" style="height: 100vh">
+        <agm-marker *ngFor="let m of markers; let i = index" [latitude]="m.lat" [longitude]="m.lng" [label]="m.label" [markerDraggable]="m.draggable"></agm-marker>
+      </agm-map>
     </div>
   </div>
-  <div class="right-pane">
-    <agm-map [latitude]="lat" [longitude]="lng">
-      <agm-marker *ngFor="let m of markers; let i = index" [latitude]="m.lat" [longitude]="m.lng" [label]="m.label" [markerDraggable]="m.draggable"></agm-marker>
-    </agm-map>
-  </div>
-</div>
+</section>
 
 <popup (confirmClick)="saveNewDevice()">
-  <div style="display: grid">
-    <label>Device Type</label>
-    <select [(ngModel)]="selectedDeviceType">
-      <option *ngFor="let deviceType of deviceTypes" [ngValue]="deviceType">{{deviceType.typeName}}</option>
-    </select>
-    <label>Device Name</label>
-    <input type="text" [(ngModel)]="deviceName">
-    <label>Username</label>
-    <input type="text" [(ngModel)]="username">
-    <label>Password</label>
-    <input type="password" [(ngModel)]="password">
-  </div>
+  <form>
+    <div class="form-group">
+      <label>Device Type</label>
+      <select class="form-control" [(ngModel)]="selectedDeviceType" [ngModelOptions]="{standalone: true}">
+        <option *ngFor="let deviceType of deviceTypes" [ngValue]="deviceType">{{deviceType.typeName}}</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Device Name</label>
+      <input type="text" class="form-control" [(ngModel)]="deviceName" [ngModelOptions]="{standalone: true}">
+    </div>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" class="form-control" [(ngModel)]="username" [ngModelOptions]="{standalone: true}">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" class="form-control" [(ngModel)]="password" [ngModelOptions]="{standalone: true}">
+    </div>
+  </form>
 </popup>

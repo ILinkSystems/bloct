@@ -1,29 +1,39 @@
-<div>
-  <div class="left-pane">
-    <div class="logo">
-        <img style="float: left" [src]="apiService.LOGO">
-      <div class="dropdown" dropdown style="float: right !important">
-        <a dropdown-open>{{currentUser?.firstName}} {{currentUser?.lastName}}</a>
-        <ul class="dropdown-menu">
-          <li>
-            <a>Manage Profile</a>
-          </li>
-          <li>
-            <a (click)="logout()">Logout</a>
-          </li>
-        </ul>
+<section class="container-fluid">
+    <div class="row">
+      <div class="col-md-3 pd0-LR">
+        <div class="deviceContainer">
+          <div class="deviceHeader clearfix">
+            <a href="javascript:;" class="float-left">
+              <img class="deviceLogo" src="assets/images/theme-dark/logo-bloct-v2-white.png">
+            </a>
+            <ul class="nav navbar-nav navbar-right">
+              <li class="dropdown text-right">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  <img src="assets/images/theme-light/button-hamburgermenu-white.png">
+                </a>
+                <ul class="dropdown-menu">
+                  <li>
+                    <a href="javascript:;">Manage Profile</a>
+                  </li>
+                  <li class="divider"></li>
+                  <li>
+                    <a href="javascript:;" (click)="logout()">Logout</a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <div class="addDeviceHead clearfix">
+            <h4 class="float-left">{{currentDevice?.deviceName}} Details</h4>
+            <a href="javascript:;" class="float-right" (click)="back()"> Back
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-9 pd0-LR">
+          <div>Video Feed</div>
+          <div>{{date}}</div>
       </div>
     </div>
-    <div>
-      <div style="float: left">{{currentDevice?.deviceName}} Details</div>
-      <button style="float: right" (click)="back()">Back</button>
-    </div>
-  </div>
-  <div class="right-pane">
-    <div class="logo">
-        <div style="float: left">Video Feed</div>
-        <div style="float: right">{{date}}</div>
-        <iframe width="100%" height="300" src="https://video.nest.com/live/wBT8p6"></iframe>
-    </div>
-  </div>
-</div>
+  </section>
+  

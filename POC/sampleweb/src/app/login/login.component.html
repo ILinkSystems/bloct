@@ -1,19 +1,56 @@
-<img [src]="apiService.LOGO">
-<div class="login-div">
-  <div>
-    <label>User Name</label>
+<div class="loginBody container">
+    <div class="row justify-content-md-center">
+      <div class="col-md-5 col-md-offset-3 mt-5">
+        <div class="text-center logoContainer">
+          <img src="assets/images/theme-light/logo-bloct-v2-purple.png" />
+        </div>
+        <div class="loginContainer">
+          <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" data-toggle="tab" href="#login" role="tab">LogIn</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-toggle="tab" href="#register" role="tab">Create Account</a>
+            </li>
+          </ul>
+          <!-- Tab panes -->
+          <div class="tab-content">
+            <div class="tab-pane active" id="login" role="tabpanel">
+              <form>
+                <div class="form-group">
+                  <label for="userName">User Name</label>
+                  <input type="email" class="form-control" id="userName" placeholder="Enter UserName" [(ngModel)]="userName" [ngModelOptions]="{standalone: true}">
+                  <!-- <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small> -->
+                </div>
+                <div class="form-group">
+                  <label for="password">Password</label>
+                  <input type="password" class="form-control" id="password" placeholder="Password" [(ngModel)]="password" [ngModelOptions]="{standalone: true}">
+                </div>
+                <div class="form-group text-right">
+                  <a href="javascript:" class="help">Need help logging in?</a>
+                </div>
+                <div class="text-center">
+                <button type="submit" class="btn btn-primary" (click)="loginClicked()">Login</button>
+              </div>
+              </form>
+            </div>
+            <div class="tab-pane" id="register" role="tabpanel">
+                <form>
+                    <div class="form-group">
+                        <label for="userName">User Name</label>
+                        <input type="email" class="form-control" id="newuserName" placeholder="Enter UserName">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="newpassword" placeholder="Password">
+                    </div>
+                    <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Register</button>
+                    </div>
+                  </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div>
-    <input type="text" class="input-text" [(ngModel)]="userName" placeholder="Username*" />
-  </div>
-  <div>
-    <label>Password</label>
-  </div>
-  <div>
-    <input type="password" class="input-text" [(ngModel)]="password" placeholder="Password*" />
-  </div>
-  <div>
-    <label class="input-text">{{result}}</label>
-  </div>
-  <button type="submit" class="submit-button" (click)="loginClicked()">Login</button>
-</div>

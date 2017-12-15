@@ -1,23 +1,84 @@
-.left-pane {
-    width: 30%;
-    background-color: lightgray;
-    float: left;
-    color: black;
-    height: 500px;
-  }
-  
-  .right-pane {
-    width: 70%;
-    float: right;
-  }
-  
-  .logo {
-    width: 100%;
-    clear: both;
-    display: inline-block;
-    margin-bottom: 35px;
-  }
-  
-  agm-map {  
-      height: 500px;  
-   }
+.deviceContainer {
+  background: #f0f0f0;
+  height: 100%;
+  width: 98%;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  /* overflow: auto; */
+  box-shadow: 3px 0px 12px rgba(0, 0, 0, 0.27);
+}
+
+.pd0-LR {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.deviceHeader {
+  background-color: #484280;
+  padding: 10px 5px;
+}
+
+.deviceHeader .dropdown-toggle::after {
+  border: 0px !important;
+}
+
+.deviceHeader .dropdown-menu {
+  border-radius: 0px;
+  top: 130%;
+  left: -13%;
+}
+
+.deviceHeader .dropdown-menu:after,
+.deviceHeader .dropdown-menu:before {
+  bottom: 100%;
+  left: 50%;
+  border: solid transparent;
+  content: " ";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.deviceHeader .dropdown-menu:after {
+  border-color: rgba(255, 255, 255, 0);
+  border-bottom-color: #ffffff;
+  border-width: 15px;
+  margin-left: -15px;
+}
+
+.deviceHeader .dropdown-menu:before {
+  border-color: rgba(251, 151, 0, 0);
+  border-bottom-color: rgba(0, 0, 0, 0.15);
+  border-width: 16px;
+  margin-left: -16px;
+}
+
+.deviceHeader .dropdown-menu li {
+  font-size: 13px;
+  color: #333333;
+  padding: 2px 5px;
+}
+
+.deviceLogo {
+  width: 80%;
+}
+
+.addDeviceHead {
+  background-color: #f1f1f1;
+  padding: 5px 15px;
+}
+
+.addDeviceHead h4 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333333;
+  margin: 0;
+}
+
+.addDeviceHead a {
+  color: #0071AA;
+  font-size: 12px;
+}
+
