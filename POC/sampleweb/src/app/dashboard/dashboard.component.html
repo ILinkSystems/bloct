@@ -31,9 +31,44 @@
           <a href="javascript:;" class="float-right" (click)="addDevice()">
             <img src="assets/images/theme-light/button-adddevice.png"> Add Device
           </a>
+          <!--Add Device Form-->
+          <div class="addDeviceForm" *ngIf="showPopup">
+            <form>
+              <div class="clearfix">
+                <label>Add Device</label>
+              </div>
+              <div class="form-group">
+                <label>Device Type</label>
+                <select class="form-control" [(ngModel)]="selectedDeviceType" [ngModelOptions]="{standalone: true}">
+                  <option *ngFor="let deviceType of deviceTypes" [ngValue]="deviceType">{{deviceType.typeName}}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Device Name</label>
+                <input type="text" class="form-control" [(ngModel)]="deviceName" [ngModelOptions]="{standalone: true}">
+              </div>
+              <div class="form-group">
+                <label>Username</label>
+                <input type="text" class="form-control" [(ngModel)]="username" [ngModelOptions]="{standalone: true}">
+              </div>
+              <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="form-control" [(ngModel)]="password" [ngModelOptions]="{standalone: true}">
+              </div>
+              <div class="form-group" *ngIf="selectedDeviceType?.id !== 3">
+                <label>API Key</label>
+                <input type="text" class="form-control" [(ngModel)]="apiKey" [ngModelOptions]="{standalone: true}">
+              </div>
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary" (click)="saveNewDevice()">Save</button>
+                <button type="submit" class="btn btn-primary" (click)="showPopup = false">Cancel</button>
+              </div>
+            </form>
+          </div>
+          <!--Add Device Form Ends Here-->
         </div>
         <ul class="listGroup">
-          <li class="listItem active clearfix" [class.active]="showActions" *ngFor="let device of apiService.devices" (click)="showActions = !showActions">
+          <li class="listItem active clearfix" [class.active]="selectedIdx === i" *ngFor="let device of apiService.devices;let i = index" (click)="selectDevice(i)">
             <div>
               <img src="assets/images/theme-light/icon-device-nest-camera.png">
             </div>
@@ -62,9 +97,9 @@
                   <img class="riskIcon" src="assets/images/theme-light/badge-atrisk.png">
                 </div>
               </div>
-              <div class="routeIcon clearfix" *ngIf="showActions">
+              <div class="routeIcon clearfix" *ngIf="selectedIdx === i">
                 <ul>
-                  <li (click)="onLocateOnMap(device)">
+                  <li (click)="onLocateOnMap(device)" *ngIf="device.deviceTypeId !== 3">
                     <img src="assets/images/theme-light/icon-locatedevice.png">
                     <span>Locate on Map</span>
                   </li>
@@ -72,7 +107,7 @@
                     <img src="assets/images/theme-light/icon-deviceinfo.png">
                     <span>View Details</span>
                   </li>
-                  <li>
+                  <li (click)="onViewBlockChain(device)">
                     <img src="assets/images/theme-light/icon-viewblockchain.png">
                     <span>View Blockchain</span>
                   </li>
@@ -85,31 +120,8 @@
     </div>
     <div class="col-md-9 pd0-LR">
       <agm-map [latitude]="lat" [longitude]="lng" style="height: 100vh">
-        <agm-marker *ngFor="let m of markers; let i = index" [latitude]="m.lat" [longitude]="m.lng" [label]="m.label" [markerDraggable]="m.draggable"></agm-marker>
+        <agm-marker *ngFor="let device of apiService.devices; let i = index" [latitude]="device.location?.lat" [longitude]="device.location?.lon"></agm-marker>
       </agm-map>
     </div>
   </div>
 </section>
-
-<popup (confirmClick)="saveNewDevice()">
-  <form>
-    <div class="form-group">
-      <label>Device Type</label>
-      <select class="form-control" [(ngModel)]="selectedDeviceType" [ngModelOptions]="{standalone: true}">
-        <option *ngFor="let deviceType of deviceTypes" [ngValue]="deviceType">{{deviceType.typeName}}</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Device Name</label>
-      <input type="text" class="form-control" [(ngModel)]="deviceName" [ngModelOptions]="{standalone: true}">
-    </div>
-    <div class="form-group">
-      <label>Username</label>
-      <input type="text" class="form-control" [(ngModel)]="username" [ngModelOptions]="{standalone: true}">
-    </div>
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" class="form-control" [(ngModel)]="password" [ngModelOptions]="{standalone: true}">
-    </div>
-  </form>
-</popup>

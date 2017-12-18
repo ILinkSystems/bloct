@@ -34,8 +34,16 @@ export class APIService {
       .then(response => response);
   }
 
-  addArloDevices(isNew, body): Promise<any> {
-    return this.http.post(this.baseUrl + 'device/arloDevices/' + isNew, body, {
+  getiTraqDevices(): Promise<any> {
+    return this.http.get(this.baseUrl + 'device/itraq', {
+      headers: new HttpHeaders().set('x-access-token', this.token),
+    })
+      .toPromise()
+      .then(response => response);
+  }
+
+  addiTraqDevices(isNew, body): Promise<any> {
+    return this.http.post(this.baseUrl + 'device/itraq/' + isNew, body, {
       headers: new HttpHeaders().set('x-access-token', this.token),
     })
       .toPromise()
@@ -43,7 +51,15 @@ export class APIService {
   }
 
   getArloDevices(): Promise<any> {
-    return this.http.get(this.baseUrl + 'device/arloDevices', {
+    return this.http.get(this.baseUrl + 'device/arlo', {
+      headers: new HttpHeaders().set('x-access-token', this.token),
+    })
+      .toPromise()
+      .then(response => response);
+  }
+
+  addArloDevices(isNew, body): Promise<any> {
+    return this.http.post(this.baseUrl + 'device/arlo/' + isNew, body, {
       headers: new HttpHeaders().set('x-access-token', this.token),
     })
       .toPromise()

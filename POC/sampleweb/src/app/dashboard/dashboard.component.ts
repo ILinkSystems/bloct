@@ -1,7 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { APIService } from '../utils/apiservice';
-import { Popup } from 'ng2-opd-popup';
 
 @Component({
     selector: 'dashboard',
@@ -10,7 +9,7 @@ import { Popup } from 'ng2-opd-popup';
 })
 
 export class DashboardComponent implements OnInit {
-    constructor(private apiService: APIService, private router: Router, private popup: Popup) { }
+    constructor(private apiService: APIService, private router: Router) { }
 
     private currentUser: any;
     private deviceTypes: any;
@@ -18,30 +17,12 @@ export class DashboardComponent implements OnInit {
     private deviceName: string;
     private username: string;
     private password: string;
+    private apiKey = '';
     private lat = 51.673858;
     private lng = 7.815982;
-    private isNew = true;
-
-    markers = [
-        {
-            lat: 51.673858,
-            lng: 7.815982,
-            label: 'A',
-            draggable: true
-        },
-        {
-            lat: 51.373858,
-            lng: 7.215982,
-            label: 'B',
-            draggable: false
-        },
-        {
-            lat: 51.723858,
-            lng: 7.895982,
-            label: 'C',
-            draggable: true
-        }
-    ];
+    private showPopup = false;
+    private selectedIdx: number;
+    private oldIndex = -1;
 
     ngOnInit(): void {
         this.apiService.devices = [];
@@ -56,24 +37,32 @@ export class DashboardComponent implements OnInit {
                     this.selectedDeviceType = this.deviceTypes[0];
                 }
             });
+            this.apiService.getApiDetails().then(data => {
+                this.getiTraqDevice(data.apiDetails);
+                this.getArloDevice(data.apiDetails);
+            });
+        }
+    }
+
+    getiTraqDevice(apiDetails) {
+        if (this.apiService.token !== '') {
+            this.apiService.getiTraqDevices().then(data => {
+                if (data.success) {
+                    if (data.itraqDevice !== null) {
+                        this.apiService.devices.push(data.itraqDevice);
+                    }
+                }
+            });
+        }
+    }
+
+    getArloDevice(apiDetails) {
+        if (this.apiService.token !== '') {
             this.apiService.getArloDevices().then(data => {
                 if (data.success) {
-                    this.apiService.devices.push(data.arloDevice);
-                }
-            }).catch(error => {
-                if (error.status === 500) {
-                    this.apiService.getApiDetails().then(data => {
-                        for (let i = 0, len = data.apiDetails.length; i < len; i++) {
-                            if (data.apiDetails[i].deviceName === 'Arlo') {
-                                this.isNew = false;
-                                this.selectedDeviceType = data.apiDetails[i].selectedDeviceType;
-                                this.deviceName = data.apiDetails[i].deviceName;
-                                this.username = data.apiDetails[i].username;
-                                this.password = data.apiDetails[i].password;
-                                this.saveNewDevice();
-                            }
-                        }
-                    });
+                    if (data.arloDevice !== null) {
+                        this.apiService.devices.push(data.arloDevice);
+                    }
                 }
             });
         }
@@ -81,19 +70,7 @@ export class DashboardComponent implements OnInit {
 
     addDevice() {
         this.clearFormData();
-        this.popup.options = {
-            header: 'Add Device',
-            color: '#5cb85c',
-            widthProsentage: 30,
-            animationDuration: 1,
-            showButtons: true,
-            confirmBtnContent: 'Save',
-            cancleBtnContent: 'Cancel',
-            confirmBtnClass: 'btn btn-default',
-            cancleBtnClass: 'btn btn-default',
-            animation: 'fadeInLeft',
-        };
-        this.popup.show();
+        this.showPopup = true;
     }
 
     saveNewDevice() {
@@ -101,18 +78,26 @@ export class DashboardComponent implements OnInit {
             selectedDeviceType: this.selectedDeviceType,
             deviceName: this.deviceName,
             username: this.username,
-            password: this.password
+            password: this.password,
+            apiKey: this.apiKey
         };
         switch (this.selectedDeviceType.id) {
+            case 1:
+                this.apiService.addiTraqDevices(true, body).then(data => {
+                    if (data.success) {
+                        this.apiService.devices.push(data.itraqDevice);
+                    }
+                });
+                break;
             case 3:
-                this.apiService.addArloDevices(this.isNew, body).then(data => {
+                this.apiService.addArloDevices(true, body).then(data => {
                     if (data.success) {
                         this.apiService.devices.push(data.arloDevice);
                     }
                 });
                 break;
         }
-        this.popup.hide();
+        this.showPopup = false;
         this.clearFormData();
     }
 
@@ -123,13 +108,26 @@ export class DashboardComponent implements OnInit {
         this.selectedDeviceType = this.deviceTypes[0];
     }
 
+    selectDevice(index) {
+        if (this.oldIndex === index) {
+            this.selectedIdx = -1;
+            this.oldIndex = -1;
+        } else {
+            this.selectedIdx = index;
+            this.oldIndex = index;
+        }
+    }
+
     onLocateOnMap(device) {
-        this.lat = 51.673858;
-        this.lng = 7.815982;
+        this.lat = device.location.lat;
+        this.lng = device.location.lon;
     }
 
     onViewDetails(device) {
         this.router.navigate(['/device', device.deviceName]);
+    }
+
+    onViewBlockChain(device) {
     }
 
     logout() {

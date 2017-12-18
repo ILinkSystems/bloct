@@ -3,7 +3,6 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { PopupModule } from 'ng2-opd-popup';
 import { AppRoutingModule } from './app-routing.module';
 import { GridModule } from '@progress/kendo-angular-grid';
 import { AgmCoreModule } from '@agm/core';
@@ -20,7 +19,6 @@ import { APIService } from './utils/apiservice';
     BrowserModule,
     FormsModule,
     HttpClientModule,
-    PopupModule.forRoot(),
     AppRoutingModule,
     GridModule,
     AgmCoreModule.forRoot({
