@@ -10,8 +10,8 @@ import { APIService } from '../utils/apiservice';
 export class LoginComponent {
     constructor(private apiService: APIService, private router: Router) { }
 
-    private userName = 'sathishn';
-    private password = 'Enter321';
+    private userName: string;
+    private password: string;
     private result: string;
 
     @Output() onSignUp = new EventEmitter<boolean>();
@@ -34,9 +34,9 @@ export class LoginComponent {
         } else {
             this.result = 'Please provide Username and Password';
         }
-    };
+    }
 
     signupClicked(): void {
         this.router.navigate(['/signup']);
-    };
+    }
 }
