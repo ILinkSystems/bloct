@@ -1,4 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { DomSanitizer } from "@angular/platform-browser";
 import { Router } from '@angular/router';
 import { APIService } from '../utils/apiservice';
 
@@ -9,7 +10,7 @@ import { APIService } from '../utils/apiservice';
 })
 
 export class DashboardComponent implements OnInit {
-    constructor(private apiService: APIService, private router: Router) { }
+    constructor(private apiService: APIService, private router: Router, private domSanitizer: DomSanitizer) { }
 
     private currentUser: any;
     private deviceTypes: any;
@@ -23,12 +24,16 @@ export class DashboardComponent implements OnInit {
     private showPopup = false;
     private selectedIdx: number;
     private oldIndex = -1;
+    private showMap = false;
+    private showIframe = false;
+    private arloSiteUrl;
 
     ngOnInit(): void {
         this.apiService.devices = [];
         if (!this.apiService.isLoggedIn) {
             this.router.navigate(['/login']);
         }
+        this.arloSiteUrl = this.domSanitizer.bypassSecurityTrustResourceUrl('https://arlo.netgear.com/');
         this.currentUser = this.apiService.currentUser;
         if (this.apiService.token !== '') {
             this.apiService.getDeviceTypes().then(data => {
@@ -108,7 +113,7 @@ export class DashboardComponent implements OnInit {
         this.selectedDeviceType = this.deviceTypes[0];
     }
 
-    selectDevice(index) {
+    selectDevice(index, selectedDevice) {
         if (this.oldIndex === index) {
             this.selectedIdx = -1;
             this.oldIndex = -1;
@@ -116,6 +121,10 @@ export class DashboardComponent implements OnInit {
             this.selectedIdx = index;
             this.oldIndex = index;
         }
+        this.showMap = selectedDevice.deviceTypeId !== 3;
+        this.showIframe = selectedDevice.deviceTypeId === 3;
+        this.lat = selectedDevice.location.lat;
+        this.lng = selectedDevice.location.lon;
     }
 
     onLocateOnMap(device) {
@@ -124,7 +133,6 @@ export class DashboardComponent implements OnInit {
     }
 
     onViewDetails(device) {
-        this.router.navigate(['/device', device.deviceName]);
     }
 
     onViewBlockChain(device) {

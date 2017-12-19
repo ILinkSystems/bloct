@@ -6,12 +6,11 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { GridModule } from '@progress/kendo-angular-grid';
 import { AgmCoreModule } from '@agm/core';
-import { DropdownModule } from 'ngx-dropdown';
+import { AgmSnazzyInfoWindowModule } from '@agm/snazzy-info-window';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { DeviceComponent } from './device/device.component';
 import { APIService } from './utils/apiservice';
 
 @NgModule({
@@ -24,13 +23,12 @@ import { APIService } from './utils/apiservice';
     AgmCoreModule.forRoot({
       apiKey: 'AIzaSyCpRyKFezhM8zRMABqR451RvplCKXnf4Wg'
     }),
-    DropdownModule
+    AgmSnazzyInfoWindowModule
   ],
   declarations: [
     AppComponent,
     LoginComponent,
     DashboardComponent,
-    DeviceComponent
   ],
   providers: [APIService],
   bootstrap: [AppComponent]
