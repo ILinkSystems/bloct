@@ -135,9 +135,9 @@ router.post('/:isNew', function (req, res) {
     itraqReq.end();
 });
 
-router.get('/blockchain', function (req, res) {
+router.get('/blockchain/:deviceId', function (req, res) {
     var contractInstance = smart_contract.contract.at(smart_contract.deployedAddress);
-    var device = contractInstance.getDeviceData.call('14334');
+    var device = contractInstance.getDeviceData.call(req.params.deviceId);
     if (device[0] == '') throw new Error('Not Found');
     itraqDevice = {
         deviceName: device[0],
@@ -150,8 +150,6 @@ router.get('/blockchain', function (req, res) {
         itraqDevice: itraqDevice
     });
 });
-
-
 
 router.get('/', function (req, res) {
     connection.db.collection('devices').findOne({

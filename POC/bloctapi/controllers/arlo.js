@@ -88,16 +88,16 @@ router.post('/:isNew', function (req, res) {
     });
 });
 
-router.get('/blockchain', function (req, res) {
+router.get('/blockchain/:deviceId', function (req, res) {
     var contractInstance = smart_contract.contract.at(smart_contract.deployedAddress);
-    var device = contractInstance.getDeviceData.call('52M17B7PAAE79');
+    var device = contractInstance.getDeviceData.call(req.params.deviceId);
     if (device[0] == '') throw new Error('Not Found');
     arloDevice = {
         deviceName: device[0],
         deviceId: device[1],
         serialNumber: device[2],
         firmwareVersion: device[3]
-    }
+    }    
     res.json({
         success: true,
         arloDevice: arloDevice

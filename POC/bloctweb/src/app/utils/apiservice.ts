@@ -50,6 +50,14 @@ export class APIService {
       .then(response => response);
   }
 
+  getiTraqBlockchain(deviceId): Promise<any> {
+    return this.http.get(this.baseUrl + 'device/itraq/blockchain/' + deviceId, {
+      headers: new HttpHeaders().set('x-access-token', this.token),
+    })
+      .toPromise()
+      .then(response => response);
+  }
+
   getArloDevices(): Promise<any> {
     return this.http.get(this.baseUrl + 'device/arlo', {
       headers: new HttpHeaders().set('x-access-token', this.token),
@@ -60,6 +68,14 @@ export class APIService {
 
   addArloDevices(isNew, body): Promise<any> {
     return this.http.post(this.baseUrl + 'device/arlo/' + isNew, body, {
+      headers: new HttpHeaders().set('x-access-token', this.token),
+    })
+      .toPromise()
+      .then(response => response);
+  }
+
+  getArloBlockchain(deviceId): Promise<any> {
+    return this.http.get(this.baseUrl + 'device/arlo/blockchain/' + deviceId, {
       headers: new HttpHeaders().set('x-access-token', this.token),
     })
       .toPromise()
