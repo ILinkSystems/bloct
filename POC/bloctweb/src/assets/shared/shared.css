@@ -1,32 +1,68 @@
-@import url('https://fonts.googleapis.com/css?family=Montserrat:400,600,700');
-body {
-  font-family: 'Montserrat', sans-serif !important;
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,600,700'); 
+@import url('https://fonts.googleapis.com/css?family=Cabin');
+@import url('https://fonts.googleapis.com/css?family=Oxygen:700');
+@import url('https://fonts.googleapis.com/css?family=Anton');
+html{
+  height: 100%;
 }
-
-.btn {
+body{
+  font-family: 'Cabin', sans-serif;
+  background: #f8f8f8;
+  height: 100%;
+}
+h1,h2,h3,h4,h5,h6{color: #434343;}
+table th{
+  color: #4f4f4f
+}
+table td{
+  color: #4a4a4a
+}
+.btn{
   border-radius: 0px;
+  font-family: 'Montserrat', sans-serif; 
+  font-weight:600; 
+  border-width: 2px;
+  min-width:110px;
 }
-
-.btn-primary {
-  background-color: #fc9700;
-  border-color: #fc9700;
+.btn-primary{
+  background-color: #0071aa;
+  border-color: #0071aa;
 }
-
+.btn-default{
+  color: #0071aa;
+  background-color:transparent;
+  border:2px solid #0071aa;
+}
 .btn-primary:hover {
-  color: #fff;
-  background-color: #484280;
-  border-color: #484280;
+  color: #0071aa;
+  background-color: transparent;
+  border:2px solid #0071aa;
 }
-
-.form-control {
+.btn-default:hover{
+  background-color: #0071aa;
+  color: #fff;
+}
+.form-control{
   border-radius: 2px;
   font-size: 14px;
+  font-family: 'Montserrat', sans-serif;
+  color: #333333;
 }
-
-.form-control:focus {
-  border-color: #484280;
+.form-control:focus{
+  border-color:  #0071aa; 
 }
-
 .form-group {
   text-align: left
+}
+/*****Map div*****/
+.si-content-wrapper{
+  padding:0px !important;
+  width:80% !important;
+}
+.si-content{
+  max-width:100% !important;
+  font-family: 'Montserrat', sans-serif;
+}
+.si-shadow-frame{
+  box-shadow:none !important; 
 }

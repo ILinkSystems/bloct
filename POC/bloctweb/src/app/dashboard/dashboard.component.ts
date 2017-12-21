@@ -22,19 +22,24 @@ export class DashboardComponent implements OnInit {
     private lat = 51.673858;
     private lng = 7.815982;
     private showPopup = false;
+    private selectedDevice: any;
+    private blockchainDevice: any;
     private selectedIdx: number;
     private oldIndex = -1;
+    private showWelcome = true;
     private showMap = false;
     private showIframe = false;
+    private showBlockchain = false;
+    private showDevices = true;
+    private showDeviceDetails = false;
+    private showProfile = false;
     private arloSiteUrl;
-    private isNewiTraq = true;
-    private isNewArlo = true;
 
     ngOnInit(): void {
         if (!this.apiService.isLoggedIn) {
             this.router.navigate(['/login']);
         }
-        this.arloSiteUrl = this.domSanitizer.bypassSecurityTrustResourceUrl('https://www.arlo.com/en-us/');
+        this.arloSiteUrl = '';
         this.currentUser = this.apiService.currentUser;
         if (this.apiService.token !== '') {
             this.apiService.getDeviceTypes().then(data => {
@@ -52,6 +57,7 @@ export class DashboardComponent implements OnInit {
         this.apiService.getiTraqDevices().then(data => {
             if (data.success) {
                 if (data.itraqDevice !== null) {
+                    data.itraqDevice.status = 'Safe';
                     this.apiService.devices.push(data.itraqDevice);
                 }
             }
@@ -59,6 +65,11 @@ export class DashboardComponent implements OnInit {
         this.apiService.getArloDevices().then(data => {
             if (data.success) {
                 if (data.arloDevice !== null) {
+                    data.arloDevice.status = 'At Risk';
+                    data.arloDevice.location = {
+                        lat: '',
+                        lon: ''
+                    };
                     this.apiService.devices.push(data.arloDevice);
                 }
             }
@@ -67,8 +78,6 @@ export class DashboardComponent implements OnInit {
 
     addDevice() {
         this.clearFormData();
-        this.isNewArlo = true;
-        this.isNewiTraq = true;
         this.showPopup = true;
     }
 
@@ -82,14 +91,14 @@ export class DashboardComponent implements OnInit {
         };
         switch (this.selectedDeviceType.id) {
             case 1:
-                this.apiService.addiTraqDevices(this.isNewiTraq, body).then(data => {
+                this.apiService.addiTraqDevices(true, body).then(data => {
                     if (data.success) {
                         this.getDevices();
                     }
                 });
                 break;
             case 3:
-                this.apiService.addArloDevices(this.isNewArlo, body).then(data => {
+                this.apiService.addArloDevices(true, body).then(data => {
                     if (data.success) {
                         this.getDevices();
                     }
@@ -100,22 +109,39 @@ export class DashboardComponent implements OnInit {
         this.clearFormData();
     }
 
+    assignBlockchainDevice(device) {
+        this.blockchainDevice = device;
+        this.showWelcome = false;
+        this.showMap = false;
+        this.showIframe = false;
+        this.showBlockchain = true;
+    }
+
     getiTraqBlockchain(deviceId, apiDetails) {
         this.apiService.getiTraqBlockchain(deviceId).then(data => {
             if (data.success) {
-                console.log(data.itraqDevice);
+                this.assignBlockchainDevice(data.itraqDevice);
             }
         }).catch(error => {
             if (error.status === 500) {
                 for (let i = 0, len = apiDetails.length; i < len; i++) {
                     if (apiDetails[i].selectedDeviceType.id === 1) {
-                        this.isNewiTraq = false;
-                        this.selectedDeviceType = apiDetails[i].selectedDeviceType;
-                        this.deviceName = apiDetails[i].deviceName;
-                        this.username = apiDetails[i].username;
-                        this.password = apiDetails[i].password;
-                        this.apiKey = apiDetails[i].apiKey;
-                        this.saveNewDevice();
+                        const body = {
+                            selectedDeviceType: apiDetails[i].selectedDeviceType,
+                            deviceName: apiDetails[i].deviceName,
+                            username: apiDetails[i].username,
+                            password: apiDetails[i].password,
+                            apiKey: apiDetails[i].apiKey
+                        };
+                        this.apiService.addiTraqDevices(false, body).then(data => {
+                            if (data.success) {
+                                this.apiService.getiTraqBlockchain(deviceId).then(result => {
+                                    if (result.success) {
+                                        this.assignBlockchainDevice(result.itraqDevice);
+                                    }
+                                });
+                            }
+                        });
                     }
                 }
             }
@@ -125,18 +151,28 @@ export class DashboardComponent implements OnInit {
     getArloBlockchain(deviceId, apiDetails) {
         this.apiService.getArloBlockchain(deviceId).then(data => {
             if (data.success) {
-                console.log(data.arloDevice);
+                this.assignBlockchainDevice(data.arloDevice);
             }
         }).catch(error => {
             if (error.status === 500) {
                 for (let i = 0, len = apiDetails.length; i < len; i++) {
                     if (apiDetails[i].selectedDeviceType.id === 3) {
-                        this.isNewArlo = false;
-                        this.selectedDeviceType = apiDetails[i].selectedDeviceType;
-                        this.deviceName = apiDetails[i].deviceName;
-                        this.username = apiDetails[i].username;
-                        this.password = apiDetails[i].password;
-                        this.saveNewDevice();
+                        const body = {
+                            selectedDeviceType: apiDetails[i].selectedDeviceType,
+                            deviceName: apiDetails[i].deviceName,
+                            username: apiDetails[i].username,
+                            password: apiDetails[i].password,
+                            apiKey: apiDetails[i].apiKey
+                        };
+                        this.apiService.addArloDevices(false, body).then(data => {
+                            if (data.success) {
+                                this.apiService.getArloBlockchain(deviceId).then(result => {
+                                    if (result.success) {
+                                        this.assignBlockchainDevice(result.arloDevice);
+                                    }
+                                });
+                            }
+                        });
                     }
                 }
             }
@@ -147,10 +183,12 @@ export class DashboardComponent implements OnInit {
         this.deviceName = '';
         this.username = '';
         this.password = '';
+        this.apiKey = '';
         this.selectedDeviceType = this.deviceTypes[0];
     }
 
     selectDevice(index, selectedDevice) {
+        this.selectedDevice = selectedDevice;
         if (this.oldIndex === index) {
             this.selectedIdx = -1;
             this.oldIndex = -1;
@@ -158,20 +196,23 @@ export class DashboardComponent implements OnInit {
             this.selectedIdx = index;
             this.oldIndex = index;
         }
-        this.showMap = selectedDevice.deviceTypeId !== 3;
-        this.showIframe = selectedDevice.deviceTypeId === 3;
-        if (selectedDevice.deviceTypeId !== 3) {
-            this.lat = selectedDevice.location.lat;
-            this.lng = selectedDevice.location.lon;
-        }
     }
 
     onLocateOnMap(device) {
+        this.showWelcome = false;
+        this.showMap = true;
         this.lat = device.location.lat;
         this.lng = device.location.lon;
     }
 
     onViewDetails(device) {
+        this.showDevices = false;
+        this.showDeviceDetails = true;
+    }
+
+    backFromDeviceDetails() {
+        this.showDeviceDetails = false;
+        this.showDevices = true;
     }
 
     onViewBlockChain(device) {
@@ -185,6 +226,22 @@ export class DashboardComponent implements OnInit {
                     break;
             }
         });
+    }
+
+    backFromBlockchain() {
+        this.showBlockchain = false;
+        this.showWelcome = true;
+    }
+
+    menuClicked() {
+        this.showDevices = false;
+        this.showDeviceDetails = false;
+        this.showProfile = true;
+    }
+
+    menuBackClicked() {
+        this.showProfile = false;
+        this.showDevices = true;
     }
 
     logout() {

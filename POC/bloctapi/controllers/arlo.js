@@ -74,7 +74,7 @@ router.post('/:isNew', function (req, res) {
                         if (err) throw err;
                         connection.db.collection('devices').updateOne({
                             deviceId: arloCamera.deviceId
-                        }, req.body, function (err, result) {
+                        }, arloCamera, function (err, result) {
                             if (err) throw err;
                             res.json({
                                 success: true,
