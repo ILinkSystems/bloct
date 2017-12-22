@@ -1,0 +1,38 @@
+.loginBody{
+    height: 100vh;
+    width: 100%;
+    background-color: #f1f1f1;
+    position: relative;
+}
+.box{ background: #dfdee4; position: absolute;}
+.box1{height: 120px; width: 50px; top: 23%; left: -2%;}
+.box2{height: 70px; width: 70px; top: 46%; left: 4%;}
+.box3{height: 40px; width: 40px; top: 54%; left: 12%;}
+.box4{height: 120px; width: 120px; bottom: 3%; left: -3%;}
+.box5{height: 30px; width: 70px; bottom: 0%; left: 30%;}
+.box6{height: 80px; width: 120px; bottom: 0%; right: 25%;}
+.box7{height: 50px; width: 80px; bottom: 0%; right: 8%;}
+.box8{height: 30px; width: 30px; bottom: 0%; right: 0%;}
+.box9{height: 120px; width: 120px; bottom: 23%; right: 2%;}
+.box10{height: 60px; width: 60px; bottom: 20%; right: 8%;}
+.box11{height: 60px; width: 60px; bottom: 34%; right: 25%;}
+.logoContainer{
+    margin: 40px 20px;
+}
+.logoContainer h1{
+    color:#484280;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.6em;
+    font-weight: 600;
+    margin: 10px 50px;
+}
+.loginContainer label{
+    margin-bottom: 2px;
+    font-size: 15px;
+    font-weight: 500;
+}
+.help{
+     color: #242424;
+     font-family: 'Montserrat', sans-serif; 
+     font-size: 13px;
+}
