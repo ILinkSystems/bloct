@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import 'rxjs/add/operator/toPromise';
+import * as config from '../config';
 
 @Injectable()
 export class APIService {
   constructor(private http: HttpClient) { }
 
-  private baseUrl = 'http://localhost:3000/api/';
+  private baseUrl = config.API_URL;
   public isLoggedIn = false;
   public token = '';
   public currentUser: any;

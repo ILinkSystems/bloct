@@ -1,7 +1,8 @@
 var express = require('express');
 var mongodb = require("mongodb");
+var config = require('../config.js');
 
-mongodb.MongoClient.connect("mongodb://localhost:27017/bloct", function (err, database) {
+mongodb.MongoClient.connect(config.mongoUrl, function (err, database) {
   if (err) {
     console.log(err);
     process.exit(1);

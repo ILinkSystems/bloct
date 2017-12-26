@@ -1,8 +1,9 @@
 var express = require('express'),
     fs = require('fs'),
     solc = require('solc'),
-    Web3 = require('web3');
-const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+    Web3 = require('web3'),
+    config = require('../config.js');
+const web3 = new Web3(new Web3.providers.HttpProvider(config.web3Url));
 const input = fs.readFileSync('contracts/devicemetadata.sol');
 const output = solc.compile(input.toString(), 1);
 const bytecode = output.contracts[':DeviceMetaData'].bytecode;
