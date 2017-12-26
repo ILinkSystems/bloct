@@ -8,7 +8,9 @@ import { APIService } from '../utils/apiservice';
     styleUrls: ['./login.component.css']
 })
 export class LoginComponent {
-    constructor(private apiService: APIService, private router: Router) { }
+    constructor(private apiService: APIService, private router: Router) { 
+        this.apiService.getConfiguration();
+    }
 
     private userName: string;
     private password: string;

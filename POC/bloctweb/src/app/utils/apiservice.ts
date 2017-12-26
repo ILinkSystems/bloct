@@ -1,17 +1,24 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import 'rxjs/add/operator/toPromise';
-import * as config from '../config';
 
 @Injectable()
 export class APIService {
   constructor(private http: HttpClient) { }
 
-  private baseUrl = config.API_URL;
+  private baseUrl: string;
   public isLoggedIn = false;
   public token = '';
   public currentUser: any;
   public devices: any;
+
+  getConfiguration() {
+    return this.http.get('./assets/config.json')
+      .toPromise()
+      .then(res => {
+        this.baseUrl = res['API_URL'];
+      });
+  }
 
   authenticate(body): Promise<any> {
     return this.http.post(this.baseUrl + 'login/authenticate', body)
