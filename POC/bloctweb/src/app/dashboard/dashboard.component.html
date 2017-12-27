@@ -301,6 +301,19 @@
               </tr>
             </table>
             <h5>Transactions</h5>
+            <kendo-grid [data]="transactions" [height]="410" [pageSize]="gridState.take" [skip]="gridState.skip" [pageable]="true"
+              [sortable]="false" (dataStateChange)="onStateChange($event)">
+              <kendo-grid-column field="id" title="Id" width="150">
+              </kendo-grid-column>
+              <kendo-grid-column field="batteryCharge" title="Battery Charge" width="150">
+              </kendo-grid-column>
+              <kendo-grid-column field="formattedTime" title="Time" width="150">
+              </kendo-grid-column>
+              <kendo-grid-column field="latitude" title="Latitude" width="150">
+              </kendo-grid-column>
+              <kendo-grid-column field="longitude" title="Longitude" width="150">
+              </kendo-grid-column>
+            </kendo-grid>
           </div>
         </div>
       </div>

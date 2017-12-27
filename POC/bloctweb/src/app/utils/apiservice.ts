@@ -66,6 +66,14 @@ export class APIService {
       .then(response => response);
   }
 
+  getiTraqTransactions(deviceId): Promise<any> {
+    return this.http.get(this.baseUrl + 'device/itraq/transactions/' + deviceId, {
+      headers: new HttpHeaders().set('x-access-token', this.token),
+    })
+      .toPromise()
+      .then(response => response);
+  }
+
   getArloDevices(): Promise<any> {
     return this.http.get(this.baseUrl + 'device/arlo', {
       headers: new HttpHeaders().set('x-access-token', this.token),

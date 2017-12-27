@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { DomSanitizer } from "@angular/platform-browser";
 import { Router } from '@angular/router';
 import { APIService } from '../utils/apiservice';
+import { State, process } from '@progress/kendo-data-query';
 
 @Component({
     selector: 'dashboard',
@@ -34,6 +35,12 @@ export class DashboardComponent implements OnInit {
     private showDeviceDetails = false;
     private showProfile = false;
     private arloSiteUrl;
+    private allTransactions: any;
+    private transactions: any;
+    public gridState: State = {
+        skip: 0,
+        take: 10
+    };
 
     ngOnInit(): void {
         if (!this.apiService.isLoggedIn) {
@@ -50,6 +57,12 @@ export class DashboardComponent implements OnInit {
                 }
             });
         }
+    }
+
+    public onStateChange(state: State) {
+        console.log(state);
+        this.gridState = state;
+        this.transactions = process(this.allTransactions, this.gridState);
     }
 
     getDevices() {
@@ -121,6 +134,13 @@ export class DashboardComponent implements OnInit {
         this.apiService.getiTraqBlockchain(deviceId).then(data => {
             if (data.success) {
                 this.assignBlockchainDevice(data.itraqDevice);
+                this.apiService.getiTraqTransactions(deviceId).then(res => {
+                    if (res.success) {
+                        console.log(res.transactions);
+                        this.allTransactions = res.transactions;
+                        this.transactions = process(this.allTransactions, this.gridState);
+                    }
+                });
             }
         }).catch(error => {
             if (error.status === 500) {
@@ -138,6 +158,13 @@ export class DashboardComponent implements OnInit {
                                 this.apiService.getiTraqBlockchain(deviceId).then(result => {
                                     if (result.success) {
                                         this.assignBlockchainDevice(result.itraqDevice);
+                                        this.apiService.getiTraqTransactions(deviceId).then(res => {
+                                            if (res.success) {
+                                                console.log(res.transactions);
+                                                this.allTransactions = res.transactions;
+                                                this.transactions = process(this.allTransactions, this.gridState);
+                                            }
+                                        });
                                     }
                                 });
                             }

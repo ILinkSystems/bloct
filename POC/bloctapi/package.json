@@ -19,6 +19,7 @@
     "nest-api": "0.0.8",
     "node-arlo-api": "^1.0.2",
     "node-blink-security": "^1.2.2",
+    "node-schedule": "^1.2.5",
     "pug": "~2.0.0-beta11",
     "serve-favicon": "~2.4.2",
     "solc": "^0.4.18",

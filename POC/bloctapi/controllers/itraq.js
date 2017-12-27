@@ -3,7 +3,9 @@ var express = require('express'),
     jwt = require('jsonwebtoken'),
     connection = require('../helpers/mongo_connections.js'),
     smart_contract = require('../helpers/smart_contract.js'),
-    https = require('https');
+    https = require('https'),
+    schedule = require('node-schedule'),
+    config = require('../config.js');
 
 router.use(function (req, res, next) {
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
@@ -159,6 +161,88 @@ router.get('/', function (req, res) {
         res.json({
             success: true,
             itraqDevice: itraqDevice
+        });
+    });
+});
+
+router.get('/transactions/:deviceId', function (req, res) {
+    var transactions = [];
+    var contractInstance = smart_contract.contract.at(smart_contract.deployedAddress);
+    var transaction = contractInstance.getDeviceTransaction.call(req.params.deviceId);
+    if (transaction[0] == '') throw new Error('Not Found');
+    transactions.push(JSON.parse(transaction[1]))
+    res.json({
+        success: true,
+        transactions: transactions
+    });
+});
+
+var j = schedule.scheduleJob(config.cornInterval, function () {
+    connection.db.collection('devices').findOne({
+        deviceTypeId: 1
+    }, function (err, itraqDevice) {
+        var deviceId = itraqDevice.deviceId
+        connection.db.collection('apidetails').findOne({
+            "selectedDeviceType.id": 1
+        }, function (err, itraqAPI) {
+            if (err) throw err;
+            var authToken = '';
+            var options = {
+                host: 'portal.itraq.com',
+                path: '/api/login',
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+            var itraqReq = https.request(options, function (itraqRes) {
+                if (itraqRes.statusCode === 200) {
+                    authToken = itraqRes.headers['x-auth-token'];
+                    var options = {
+                        host: 'portal.itraq.com',
+                        path: '/api/devices/' + deviceId + '/history?page=0&pagesize=1&sortdirection=desc&' +
+                            'includeLocations=true&includeTemperature=true&includeSensors=true&fromDate=0&' +
+                            'tillDate=&direction=earlier',
+                        method: 'get',
+                        headers: {
+                            'X-AUTH-TOKEN': authToken,
+                            'Content-Type': 'application/json'
+                        }
+                    };
+                    var itraqReq = https.request(options, function (itraqRes) {
+                        if (itraqRes.statusCode === 200) {
+                            itraqRes.setEncoding('utf8');
+                            itraqRes.on('data', function (body) {
+                                var transaction = JSON.parse(body).data.content[0];
+                                var contractInstance = smart_contract.contract.at(smart_contract.deployedAddress);
+                                contractInstance.addDeviceTransaction(deviceId, JSON.stringify(transaction), {
+                                    from: smart_contract.web3.eth.coinbase,
+                                    gas: 900000
+                                }, (err, transactionHash) => {
+                                    var trans = {
+                                        deviceId: deviceId,
+                                        transaction: transaction,
+                                        transactionHash: transactionHash
+                                    }
+                                    connection.db.collection('transactions').insertOne(trans, function (err, result) {
+                                        if (err) throw err;
+                                    });
+                                });
+                            });
+                        }
+                    });
+                    itraqReq.write('');
+                    itraqReq.end();
+                }
+            });
+            var obj = {
+                email: itraqAPI.username,
+                password: itraqAPI.password,
+                apiKey: itraqAPI.apiKey
+            }
+            itraqReq.write(JSON.stringify(obj));
+            itraqReq.end();
+
         });
     });
 });
