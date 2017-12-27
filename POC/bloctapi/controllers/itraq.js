@@ -71,7 +71,8 @@ router.post('/:isNew', function (req, res) {
                                 lat: device.lastLocation.latitude,
                                 lon: device.lastLocation.longitude
                             },
-                            deviceTypeId: req.body.selectedDeviceType.id
+                            deviceTypeId: req.body.selectedDeviceType.id,
+                            loginName: req.body.loginName
                         }
                         var contractInstance = smart_contract.contract.at(smart_contract.deployedAddress);
                         contractInstance.addDeviceData(itraqDevice.deviceName, itraqDevice.deviceId, itraqDevice.serialNumber, itraqDevice.firmwareVersion, {
@@ -93,11 +94,19 @@ router.post('/:isNew', function (req, res) {
                                 });
                             } else {
                                 connection.db.collection('apidetails').updateOne({
-                                    "selectedDeviceType.id": 1
+                                    $and: [{
+                                        "selectedDeviceType.id": 1
+                                    }, {
+                                        loginName: req.body.loginName
+                                    }]
                                 }, req.body, function (err, result) {
                                     if (err) throw err;
                                     connection.db.collection('devices').updateOne({
-                                        deviceId: itraqDevice.deviceId
+                                        $and: [{
+                                            deviceId: itraqDevice.deviceId
+                                        }, {
+                                            loginName: itraqDevice.loginName
+                                        }]
                                     }, itraqDevice, function (err, result) {
                                         if (err) throw err;
                                         res.json({
@@ -153,9 +162,13 @@ router.get('/blockchain/:deviceId', function (req, res) {
     });
 });
 
-router.get('/', function (req, res) {
+router.get('/:loginName', function (req, res) {
     connection.db.collection('devices').findOne({
-        deviceTypeId: 1
+        $and: [{
+            deviceTypeId: 1
+        }, {
+            loginName: req.params.loginName
+        }]
     }, function (err, itraqDevice) {
         if (err) throw err;
         res.json({

@@ -39,7 +39,8 @@ router.post('/:isNew', function (req, res) {
                     deviceId: deviceArray[i].deviceId,
                     serialNumber: deviceArray[i].uniqueId,
                     firmwareVersion: deviceArray[i].firmwareVersion,
-                    deviceTypeId: req.body.selectedDeviceType.id
+                    deviceTypeId: req.body.selectedDeviceType.id,
+                    loginName: req.body.loginName
                 }
             }
         }
@@ -69,11 +70,19 @@ router.post('/:isNew', function (req, res) {
                     });
                 } else {
                     connection.db.collection('apidetails').updateOne({
-                        "selectedDeviceType.id": 3
+                        $and: [{
+                            "selectedDeviceType.id": 3
+                        }, {
+                            loginName: req.body.loginName
+                        }]
                     }, req.body, function (err, result) {
                         if (err) throw err;
                         connection.db.collection('devices').updateOne({
-                            deviceId: arloCamera.deviceId
+                            $and: [{
+                                deviceId: arloCamera.deviceId
+                            }, {
+                                loginName: arloCamera.loginName
+                            }]
                         }, arloCamera, function (err, result) {
                             if (err) throw err;
                             res.json({
@@ -97,16 +106,20 @@ router.get('/blockchain/:deviceId', function (req, res) {
         deviceId: device[1],
         serialNumber: device[2],
         firmwareVersion: device[3]
-    }    
+    }
     res.json({
         success: true,
         arloDevice: arloDevice
     });
 });
 
-router.get('/', function (req, res) {
+router.get('/:loginName', function (req, res) {
     connection.db.collection('devices').findOne({
-        deviceTypeId: 3
+        $and: [{
+            deviceTypeId: 3
+        }, {
+            loginName: req.params.loginName
+        }]
     }, function (err, arloDevice) {
         if (err) throw err;
         res.json({

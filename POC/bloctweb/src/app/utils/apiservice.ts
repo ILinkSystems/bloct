@@ -42,8 +42,8 @@ export class APIService {
       .then(response => response);
   }
 
-  getiTraqDevices(): Promise<any> {
-    return this.http.get(this.baseUrl + 'device/itraq', {
+  getiTraqDevices(loginName): Promise<any> {
+    return this.http.get(this.baseUrl + 'device/itraq/' + loginName, {
       headers: new HttpHeaders().set('x-access-token', this.token),
     })
       .toPromise()
@@ -74,8 +74,8 @@ export class APIService {
       .then(response => response);
   }
 
-  getArloDevices(): Promise<any> {
-    return this.http.get(this.baseUrl + 'device/arlo', {
+  getArloDevices(loginName): Promise<any> {
+    return this.http.get(this.baseUrl + 'device/arlo/' + loginName, {
       headers: new HttpHeaders().set('x-access-token', this.token),
     })
       .toPromise()

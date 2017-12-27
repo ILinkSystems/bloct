@@ -67,7 +67,7 @@ export class DashboardComponent implements OnInit {
 
     getDevices() {
         this.apiService.devices = [];
-        this.apiService.getiTraqDevices().then(data => {
+        this.apiService.getiTraqDevices(this.apiService.currentUser.loginName).then(data => {
             if (data.success) {
                 if (data.itraqDevice !== null) {
                     data.itraqDevice.status = 'Safe';
@@ -75,7 +75,7 @@ export class DashboardComponent implements OnInit {
                 }
             }
         });
-        this.apiService.getArloDevices().then(data => {
+        this.apiService.getArloDevices(this.apiService.currentUser.loginName).then(data => {
             if (data.success) {
                 if (data.arloDevice !== null) {
                     data.arloDevice.status = 'At Risk';
@@ -100,7 +100,8 @@ export class DashboardComponent implements OnInit {
             deviceName: this.deviceName,
             username: this.username,
             password: this.password,
-            apiKey: this.apiKey
+            apiKey: this.apiKey,
+            loginName: this.apiService.currentUser.loginName
         };
         switch (this.selectedDeviceType.id) {
             case 1:
@@ -145,13 +146,14 @@ export class DashboardComponent implements OnInit {
         }).catch(error => {
             if (error.status === 500) {
                 for (let i = 0, len = apiDetails.length; i < len; i++) {
-                    if (apiDetails[i].selectedDeviceType.id === 1) {
+                    if (apiDetails[i].selectedDeviceType.id === 1 && apiDetails[i].loginName === this.apiService.currentUser.loginName) {
                         const body = {
                             selectedDeviceType: apiDetails[i].selectedDeviceType,
                             deviceName: apiDetails[i].deviceName,
                             username: apiDetails[i].username,
                             password: apiDetails[i].password,
-                            apiKey: apiDetails[i].apiKey
+                            apiKey: apiDetails[i].apiKey,
+                            loginName: apiDetails[i].loginName
                         };
                         this.apiService.addiTraqDevices(false, body).then(data => {
                             if (data.success) {
@@ -183,13 +185,14 @@ export class DashboardComponent implements OnInit {
         }).catch(error => {
             if (error.status === 500) {
                 for (let i = 0, len = apiDetails.length; i < len; i++) {
-                    if (apiDetails[i].selectedDeviceType.id === 3) {
+                    if (apiDetails[i].selectedDeviceType.id === 3 && apiDetails[i].loginName === this.apiService.currentUser.loginName) {
                         const body = {
                             selectedDeviceType: apiDetails[i].selectedDeviceType,
                             deviceName: apiDetails[i].deviceName,
                             username: apiDetails[i].username,
                             password: apiDetails[i].password,
-                            apiKey: apiDetails[i].apiKey
+                            apiKey: apiDetails[i].apiKey,
+                            loginName: apiDetails[i].loginName
                         };
                         this.apiService.addArloDevices(false, body).then(data => {
                             if (data.success) {
