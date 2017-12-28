@@ -20,13 +20,14 @@ export class DashboardComponent implements OnInit {
     private username: string;
     private password: string;
     private apiKey = '';
-    private lat = 51.673858;
-    private lng = 7.815982;
+    private lat: number;
+    private lng: number;
     private showPopup = false;
     private selectedDevice: any;
     private blockchainDevice: any;
     private selectedIdx: number;
     private oldIndex = -1;
+    private markerDevices: any;
     private showWelcome = true;
     private showMap = false;
     private showIframe = false;
@@ -75,6 +76,14 @@ export class DashboardComponent implements OnInit {
                 }
             }
         });
+        this.apiService.getTiveDevices(this.apiService.currentUser.loginName).then(data => {
+            if (data.success) {
+                if (data.tiveDevice !== null) {
+                    data.tiveDevice.status = 'Unsafe';
+                    this.apiService.devices.push(data.tiveDevice);
+                }
+            }
+        });
         this.apiService.getArloDevices(this.apiService.currentUser.loginName).then(data => {
             if (data.success) {
                 if (data.arloDevice !== null) {
@@ -106,6 +115,13 @@ export class DashboardComponent implements OnInit {
         switch (this.selectedDeviceType.id) {
             case 1:
                 this.apiService.addiTraqDevices(true, body).then(data => {
+                    if (data.success) {
+                        this.getDevices();
+                    }
+                });
+                break;
+            case 2:
+                this.apiService.addTiveDevices(true, body).then(data => {
                     if (data.success) {
                         this.getDevices();
                     }
@@ -177,6 +193,38 @@ export class DashboardComponent implements OnInit {
         });
     }
 
+    getTiveBlockchain(deviceId, apiDetails) {
+        this.apiService.getTiveBlockchain(deviceId).then(data => {
+            if (data.success) {
+                this.assignBlockchainDevice(data.tiveDevice);
+            }
+        }).catch(error => {
+            if (error.status === 500) {
+                for (let i = 0, len = apiDetails.length; i < len; i++) {
+                    if (apiDetails[i].selectedDeviceType.id === 2 && apiDetails[i].loginName === this.apiService.currentUser.loginName) {
+                        const body = {
+                            selectedDeviceType: apiDetails[i].selectedDeviceType,
+                            deviceName: apiDetails[i].deviceName,
+                            username: apiDetails[i].username,
+                            password: apiDetails[i].password,
+                            apiKey: apiDetails[i].apiKey,
+                            loginName: apiDetails[i].loginName
+                        };
+                        this.apiService.addTiveDevices(false, body).then(data => {
+                            if (data.success) {
+                                this.apiService.getTiveBlockchain(deviceId).then(result => {
+                                    if (result.success) {
+                                        this.assignBlockchainDevice(result.tiveDevice);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+
     getArloBlockchain(deviceId, apiDetails) {
         this.apiService.getArloBlockchain(deviceId).then(data => {
             if (data.success) {
@@ -229,8 +277,10 @@ export class DashboardComponent implements OnInit {
     }
 
     onLocateOnMap(device) {
+        this.markerDevices = [];
         this.showWelcome = false;
         this.showMap = true;
+        this.markerDevices.push(device);
         this.lat = device.location.lat;
         this.lng = device.location.lon;
     }
@@ -250,6 +300,9 @@ export class DashboardComponent implements OnInit {
             switch (device.deviceTypeId) {
                 case 1:
                     this.getiTraqBlockchain(device.deviceId, data.apiDetails);
+                    break;
+                case 2:
+                    this.getTiveBlockchain(device.deviceId, data.apiDetails);
                     break;
                 case 3:
                     this.getArloBlockchain(device.deviceId, data.apiDetails);
