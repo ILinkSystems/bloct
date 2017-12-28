@@ -42,8 +42,8 @@ export class APIService {
       .then(response => response);
   }
 
-  getiTraqDevices(): Promise<any> {
-    return this.http.get(this.baseUrl + 'device/itraq', {
+  getiTraqDevices(loginName): Promise<any> {
+    return this.http.get(this.baseUrl + 'device/itraq/' + loginName, {
       headers: new HttpHeaders().set('x-access-token', this.token),
     })
       .toPromise()
@@ -66,8 +66,40 @@ export class APIService {
       .then(response => response);
   }
 
-  getArloDevices(): Promise<any> {
-    return this.http.get(this.baseUrl + 'device/arlo', {
+  getiTraqTransactions(deviceId): Promise<any> {
+    return this.http.get(this.baseUrl + 'device/itraq/transactions/' + deviceId, {
+      headers: new HttpHeaders().set('x-access-token', this.token),
+    })
+      .toPromise()
+      .then(response => response);
+  }
+
+  getTiveDevices(loginName): Promise<any> {
+    return this.http.get(this.baseUrl + 'device/tive/' + loginName, {
+      headers: new HttpHeaders().set('x-access-token', this.token),
+    })
+      .toPromise()
+      .then(response => response);
+  }
+
+  addTiveDevices(isNew, body): Promise<any> {
+    return this.http.post(this.baseUrl + 'device/tive/' + isNew, body, {
+      headers: new HttpHeaders().set('x-access-token', this.token),
+    })
+      .toPromise()
+      .then(response => response);
+  }
+
+  getTiveBlockchain(deviceId): Promise<any> {
+    return this.http.get(this.baseUrl + 'device/tive/blockchain/' + deviceId, {
+      headers: new HttpHeaders().set('x-access-token', this.token),
+    })
+      .toPromise()
+      .then(response => response);
+  }
+
+  getArloDevices(loginName): Promise<any> {
+    return this.http.get(this.baseUrl + 'device/arlo/' + loginName, {
       headers: new HttpHeaders().set('x-access-token', this.token),
     })
       .toPromise()

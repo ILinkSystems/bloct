@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { DomSanitizer } from "@angular/platform-browser";
 import { Router } from '@angular/router';
 import { APIService } from '../utils/apiservice';
+import { State, process } from '@progress/kendo-data-query';
 
 @Component({
     selector: 'dashboard',
@@ -19,13 +20,14 @@ export class DashboardComponent implements OnInit {
     private username: string;
     private password: string;
     private apiKey = '';
-    private lat = 51.673858;
-    private lng = 7.815982;
+    private lat: number;
+    private lng: number;
     private showPopup = false;
     private selectedDevice: any;
     private blockchainDevice: any;
     private selectedIdx: number;
     private oldIndex = -1;
+    private markerDevices: any;
     private showWelcome = true;
     private showMap = false;
     private showIframe = false;
@@ -34,6 +36,12 @@ export class DashboardComponent implements OnInit {
     private showDeviceDetails = false;
     private showProfile = false;
     private arloSiteUrl;
+    private allTransactions: any;
+    private transactions: any;
+    public gridState: State = {
+        skip: 0,
+        take: 10
+    };
 
     ngOnInit(): void {
         if (!this.apiService.isLoggedIn) {
@@ -52,9 +60,15 @@ export class DashboardComponent implements OnInit {
         }
     }
 
+    public onStateChange(state: State) {
+        console.log(state);
+        this.gridState = state;
+        this.transactions = process(this.allTransactions, this.gridState);
+    }
+
     getDevices() {
         this.apiService.devices = [];
-        this.apiService.getiTraqDevices().then(data => {
+        this.apiService.getiTraqDevices(this.apiService.currentUser.loginName).then(data => {
             if (data.success) {
                 if (data.itraqDevice !== null) {
                     data.itraqDevice.status = 'Safe';
@@ -62,7 +76,15 @@ export class DashboardComponent implements OnInit {
                 }
             }
         });
-        this.apiService.getArloDevices().then(data => {
+        this.apiService.getTiveDevices(this.apiService.currentUser.loginName).then(data => {
+            if (data.success) {
+                if (data.tiveDevice !== null) {
+                    data.tiveDevice.status = 'Unsafe';
+                    this.apiService.devices.push(data.tiveDevice);
+                }
+            }
+        });
+        this.apiService.getArloDevices(this.apiService.currentUser.loginName).then(data => {
             if (data.success) {
                 if (data.arloDevice !== null) {
                     data.arloDevice.status = 'At Risk';
@@ -87,11 +109,19 @@ export class DashboardComponent implements OnInit {
             deviceName: this.deviceName,
             username: this.username,
             password: this.password,
-            apiKey: this.apiKey
+            apiKey: this.apiKey,
+            loginName: this.apiService.currentUser.loginName
         };
         switch (this.selectedDeviceType.id) {
             case 1:
                 this.apiService.addiTraqDevices(true, body).then(data => {
+                    if (data.success) {
+                        this.getDevices();
+                    }
+                });
+                break;
+            case 2:
+                this.apiService.addTiveDevices(true, body).then(data => {
                     if (data.success) {
                         this.getDevices();
                     }
@@ -121,23 +151,70 @@ export class DashboardComponent implements OnInit {
         this.apiService.getiTraqBlockchain(deviceId).then(data => {
             if (data.success) {
                 this.assignBlockchainDevice(data.itraqDevice);
+                this.apiService.getiTraqTransactions(deviceId).then(res => {
+                    if (res.success) {
+                        console.log(res.transactions);
+                        this.allTransactions = res.transactions;
+                        this.transactions = process(this.allTransactions, this.gridState);
+                    }
+                });
             }
         }).catch(error => {
             if (error.status === 500) {
                 for (let i = 0, len = apiDetails.length; i < len; i++) {
-                    if (apiDetails[i].selectedDeviceType.id === 1) {
+                    if (apiDetails[i].selectedDeviceType.id === 1 && apiDetails[i].loginName === this.apiService.currentUser.loginName) {
                         const body = {
                             selectedDeviceType: apiDetails[i].selectedDeviceType,
                             deviceName: apiDetails[i].deviceName,
                             username: apiDetails[i].username,
                             password: apiDetails[i].password,
-                            apiKey: apiDetails[i].apiKey
+                            apiKey: apiDetails[i].apiKey,
+                            loginName: apiDetails[i].loginName
                         };
                         this.apiService.addiTraqDevices(false, body).then(data => {
                             if (data.success) {
                                 this.apiService.getiTraqBlockchain(deviceId).then(result => {
                                     if (result.success) {
                                         this.assignBlockchainDevice(result.itraqDevice);
+                                        this.apiService.getiTraqTransactions(deviceId).then(res => {
+                                            if (res.success) {
+                                                console.log(res.transactions);
+                                                this.allTransactions = res.transactions;
+                                                this.transactions = process(this.allTransactions, this.gridState);
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }
+
+    getTiveBlockchain(deviceId, apiDetails) {
+        this.apiService.getTiveBlockchain(deviceId).then(data => {
+            if (data.success) {
+                this.assignBlockchainDevice(data.tiveDevice);
+            }
+        }).catch(error => {
+            if (error.status === 500) {
+                for (let i = 0, len = apiDetails.length; i < len; i++) {
+                    if (apiDetails[i].selectedDeviceType.id === 2 && apiDetails[i].loginName === this.apiService.currentUser.loginName) {
+                        const body = {
+                            selectedDeviceType: apiDetails[i].selectedDeviceType,
+                            deviceName: apiDetails[i].deviceName,
+                            username: apiDetails[i].username,
+                            password: apiDetails[i].password,
+                            apiKey: apiDetails[i].apiKey,
+                            loginName: apiDetails[i].loginName
+                        };
+                        this.apiService.addTiveDevices(false, body).then(data => {
+                            if (data.success) {
+                                this.apiService.getTiveBlockchain(deviceId).then(result => {
+                                    if (result.success) {
+                                        this.assignBlockchainDevice(result.tiveDevice);
                                     }
                                 });
                             }
@@ -156,13 +233,14 @@ export class DashboardComponent implements OnInit {
         }).catch(error => {
             if (error.status === 500) {
                 for (let i = 0, len = apiDetails.length; i < len; i++) {
-                    if (apiDetails[i].selectedDeviceType.id === 3) {
+                    if (apiDetails[i].selectedDeviceType.id === 3 && apiDetails[i].loginName === this.apiService.currentUser.loginName) {
                         const body = {
                             selectedDeviceType: apiDetails[i].selectedDeviceType,
                             deviceName: apiDetails[i].deviceName,
                             username: apiDetails[i].username,
                             password: apiDetails[i].password,
-                            apiKey: apiDetails[i].apiKey
+                            apiKey: apiDetails[i].apiKey,
+                            loginName: apiDetails[i].loginName
                         };
                         this.apiService.addArloDevices(false, body).then(data => {
                             if (data.success) {
@@ -199,8 +277,10 @@ export class DashboardComponent implements OnInit {
     }
 
     onLocateOnMap(device) {
+        this.markerDevices = [];
         this.showWelcome = false;
         this.showMap = true;
+        this.markerDevices.push(device);
         this.lat = device.location.lat;
         this.lng = device.location.lon;
     }
@@ -220,6 +300,9 @@ export class DashboardComponent implements OnInit {
             switch (device.deviceTypeId) {
                 case 1:
                     this.getiTraqBlockchain(device.deviceId, data.apiDetails);
+                    break;
+                case 2:
+                    this.getTiveBlockchain(device.deviceId, data.apiDetails);
                     break;
                 case 3:
                     this.getArloBlockchain(device.deviceId, data.apiDetails);
